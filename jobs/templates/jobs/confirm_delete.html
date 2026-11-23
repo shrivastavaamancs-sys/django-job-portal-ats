@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Confirm Delete</title>
+</head>
+<body>
+  {% include "jobs/base_nav.html" %}
+  <div class="container">
+    <div class="card">
+      <h2>Confirm Delete</h2>
+      <p>Kya aap waqai <strong>{{ object_title }}</strong> ko permanently delete karna chahte hain?</p>
+      <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn" style="background: #dc2626;">Yes, Delete</button>
+        <a href="{{ cancel_url }}" style="margin-left: 12px;">Cancel</a>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

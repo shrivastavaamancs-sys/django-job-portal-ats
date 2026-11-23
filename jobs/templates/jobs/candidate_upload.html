@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Candidate Resume Upload</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f9;
+      margin: 0;
+      color: #1f2937;
+    }
+    .container {
+      max-width: 1100px;
+      margin: 24px auto;
+      padding: 0 16px;
+    }
+    .card {
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    }
+    h2 {
+      margin-top: 0;
+      margin-bottom: 16px;
+      font-size: 20px;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+    }
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="number"],
+    input[type="file"],
+    textarea {
+      width: 100%;
+      padding: 9px 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    textarea {
+      min-height: 85px;
+      resize: vertical;
+    }
+    .btn {
+      margin-top: 16px;
+      background: #2563eb;
+      color: #ffffff;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn:hover {
+      background: #1d4ed8;
+    }
+    .alert-error {
+      background: #fef2f2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+      padding: 12px 16px;
+      border-radius: 6px;
+      margin-bottom: 16px;
+    }
+    .alert-success {
+      background: #f0fdf4;
+      color: #166534;
+      border: 1px solid #bbf7d0;
+      padding: 12px 16px;
+      border-radius: 6px;
+      margin-bottom: 16px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    th, td {
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 1px solid #e5e7eb;
+      vertical-align: top;
+    }
+    th {
+      background: #f8fafc;
+      font-weight: 600;
+    }
+    a {
+      color: #2563eb;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  {% include "jobs/base_nav.html" %}
+  <div class="container">
+    {% if errors %}
+      <div class="alert-error">
+        <strong>Error:</strong>
+        <ul style="margin: 6px 0 0 18px;">
+          {% for err in errors %}
+            <li>{{ err }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    {% if success_message %}
+      <div class="alert-success">
+        <strong>{{ success_message }}</strong>
+      </div>
+    {% endif %}
+
+    <div class="card">
+      <h2>Candidate Details & Resume Upload</h2>
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="grid-3">
+          <div>
+            <label for="id_name">Full Name *</label>
+            <input
+              type="text"
+              id="id_name"
+              name="name"
+              value="{{ form_data.name|default:'' }}"
+              placeholder="e.g. Aman Sharma"
+              required
+            />
+          </div>
+          <div>
+            <label for="id_email">Email Address *</label>
+            <input
+              type="email"
+              id="id_email"
+              name="email"
+              value="{{ form_data.email|default:'' }}"
+              placeholder="e.g. aman@example.com"
+              required
+            />
+          </div>
+          <div>
+            <label for="id_phone">Contact Number *</label>
+            <input
+              type="tel"
+              id="id_phone"
+              name="phone"
+              value="{{ form_data.phone|default:'' }}"
+              placeholder="e.g. +91 9876543210"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="grid-3" style="margin-top: 14px;">
+          <div>
+            <label for="id_qualification">Qualification *</label>
+            <input
+              type="text"
+              id="id_qualification"
+              name="qualification"
+              value="{{ form_data.qualification|default:'' }}"
+              placeholder="e.g. MCA / B.Tech"
+              required
+            />
+          </div>
+          <div>
+            <label for="id_experience">Experience (Years) *</label>
+            <input
+              type="number"
+              step="0.5"
+              min="0"
+              id="id_experience"
+              name="experience"
+              value="{{ form_data.experience|default:'' }}"
+              placeholder="e.g. 1.5"
+              required
+            />
+          </div>
+          <div>
+            <label for="id_resume">Upload Resume (PDF / DOC / DOCX)</label>
+            <input
+              type="file"
+              id="id_resume"
+              name="resume"
+              accept=".pdf,.doc,.docx"
+            />
+          </div>
+        </div>
+
+        <div style="margin-top: 14px;">
+          <label for="id_skills">Skills *</label>
+          <textarea
+            id="id_skills"
+            name="skills"
+            placeholder="e.g. Python, Django, DRF, PostgreSQL, SQL, Git, Docker"
+            required
+          >{{ form_data.skills|default:'' }}</textarea>
+        </div>
+
+        <button type="submit" class="btn">Save Candidate & Resume</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>Recently Added Candidates</h2>
+      {% if recent_candidates %}
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email & Contact</th>
+              <th>Qualification & Exp</th>
+              <th>Skills</th>
+              <th>Resume</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for cand in recent_candidates %}
+              <tr>
+                <td><strong>{{ cand.full_name }}</strong></td>
+                <td>
+                  {{ cand.email }}<br>
+                  <small>{{ cand.phone }}</small>
+                </td>
+                <td>
+                  {{ cand.qualification }}<br>
+                  <small>{{ cand.experience_years }} yrs</small>
+                </td>
+                <td>{{ cand.skills }}</td>
+                <td>
+                  {% if cand.resume %}
+                    <a href="{{ cand.resume.url }}" target="_blank" rel="noopener noreferrer">Download</a>
+                  {% else %}
+                    <span>-</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <a href="{% url 'candidate-edit' cand.id %}">Edit</a> |
+                  <a href="{% url 'candidate-delete' cand.id %}" style="color: #dc2626;">Delete</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p>Abhi koi candidate add nahi hua hai.</p>
+      {% endif %}
+    </div>
+  </div>
+</body>
+</html>

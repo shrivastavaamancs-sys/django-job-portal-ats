@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Edit Candidate</title>
+</head>
+<body>
+  {% include "jobs/base_nav.html" %}
+  <div class="container">
+    {% if errors %}
+      <div class="alert-error">
+        <strong>Error:</strong>
+        <ul style="margin: 6px 0 0 18px;">
+          {% for err in errors %}<li>{{ err }}</li>{% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    <div class="card">
+      <h2>Edit Candidate: {{ candidate.full_name }}</h2>
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="grid-3">
+          <div>
+            <label for="id_name">Full Name *</label>
+            <input type="text" id="id_name" name="name" value="{{ form_data.name }}" required />
+          </div>
+          <div>
+            <label for="id_email">Email Address *</label>
+            <input type="email" id="id_email" name="email" value="{{ form_data.email }}" required />
+          </div>
+          <div>
+            <label for="id_phone">Contact Number *</label>
+            <input type="tel" id="id_phone" name="phone" value="{{ form_data.phone }}" required />
+          </div>
+        </div>
+
+        <div class="grid-3" style="margin-top: 14px;">
+          <div>
+            <label for="id_qualification">Qualification *</label>
+            <input type="text" id="id_qualification" name="qualification" value="{{ form_data.qualification }}" required />
+          </div>
+          <div>
+            <label for="id_experience">Experience (Years) *</label>
+            <input type="number" step="0.5" min="0" id="id_experience" name="experience" value="{{ form_data.experience }}" required />
+          </div>
+          <div>
+            <label for="id_resume">Replace Resume (Optional PDF / DOCX)</label>
+            <input type="file" id="id_resume" name="resume" accept=".pdf,.docx" />
+            {% if candidate.resume %}
+              <small>Current: <a href="{{ candidate.resume.url }}" target="_blank">{{ candidate.resume.name }}</a></small>
+            {% endif %}
+          </div>
+        </div>
+
+        <div style="margin-top: 14px;">
+          <label for="id_skills">Skills *</label>
+          <textarea id="id_skills" name="skills" required>{{ form_data.skills }}</textarea>
+        </div>
+
+        <button type="submit" class="btn">Update Candidate</button>
+        <a href="/upload-resume/" style="margin-left: 12px;">Cancel</a>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

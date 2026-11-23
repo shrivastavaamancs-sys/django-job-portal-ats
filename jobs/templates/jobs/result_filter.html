@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Filter Candidates by Skills & Experience</title>
+</head>
+<body>
+  {% include "jobs/base_nav.html" %}
+  <div class="container">
+    <div class="card">
+      <h2>Filter Candidates (Skills & Experience)</h2>
+      <form method="get">
+        <div class="grid-3">
+          <div>
+            <label for="id_jd">Saved Job Description (Optional)</label>
+            <select id="id_jd" name="jd_id">
+              <option value="">-- Manual Skills & Experience Filter --</option>
+              {% for jd in jds %}
+                <option value="{{ jd.id }}" {% if selected_jd_id == jd.id|stringformat:"s" %}selected{% endif %}>
+                  {{ jd.title }} ({{ jd.min_experience }}+ yrs)
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label for="id_skills">Required Skills</label>
+            <input type="text" id="id_skills" name="skills" value="{{ skills_query }}" placeholder="e.g. Python, Django, SQL" />
+          </div>
+          <div>
+            <label for="id_min_exp">Minimum Experience (Years)</label>
+            <input type="number" step="0.5" min="0" id="id_min_exp" name="min_experience" value="{{ min_experience }}" />
+          </div>
+        </div>
+        <button type="submit" class="btn">Filter Candidates</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>Filtered Candidates ({{ results|length }})</h2>
+      {% if results %}
+        <table>
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Candidate Info</th>
+              <th>Experience & Qualification</th>
+              <th>Skill Match</th>
+              <th>Matched / Missing</th>
+              <th>Resume</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in results %}
+              <tr>
+                <td>#{{ forloop.counter }}</td>
+                <td>
+                  <strong>{{ item.candidate.full_name }}</strong><br>
+                  <small>{{ item.candidate.email }} | {{ item.candidate.phone }}</small>
+                </td>
+                <td>
+                  <strong>{{ item.candidate.experience_years }} yrs</strong><br>
+                  <small>{{ item.candidate.qualification }}</small>
+                </td>
+                <td><span class="badge">{{ item.score }}%</span></td>
+                <td>
+                  <div>
+                    {% for kw in item.matched_keywords %}
+                      <span class="tag">{{ kw }}</span>
+                    {% empty %}
+                      <span>-</span>
+                    {% endfor %}
+                  </div>
+                  {% if item.missing_keywords %}
+                    <div style="margin-top: 4px;">
+                      <small>Missing:</small>
+                      {% for mkw in item.missing_keywords %}
+                        <span class="tag tag-miss">{{ mkw }}</span>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if item.resume_url %}
+                    <a href="{{ item.resume_url }}" target="_blank">{{ item.resume_name }}</a>
+                  {% else %}
+                    <span>No Resume</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <a href="/candidate/{{ item.candidate.id }}/edit/">Edit</a> |
+                  <a href="/candidate/{{ item.candidate.id }}/delete/" style="color: #dc2626;">Delete</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p>Diye gaye skills aur minimum experience criteria ke hisaab se koi candidate nahi mila.</p>
+      {% endif %}
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Candidate Info & JD Resume Filter Dashboard</title>
+  <style>
+    * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
+    body { margin: 0; background: #f4f6f9; color: #1f2937; }
+    .container { max-width: 1100px; margin: 28px auto; padding: 0 16px; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+    .header h1 { margin: 0; font-size: 24px; }
+    .links a { margin-left: 12px; color: #2563eb; text-decoration: none; font-weight: 500; }
+    .card { background: #fff; border-radius: 10px; padding: 22px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 24px; }
+    .card h2 { margin-top: 0; font-size: 19px; margin-bottom: 14px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    @media (max-width: 820px) {
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    }
+    label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 14px; }
+    input[type="text"], input[type="email"], input[type="tel"], input[type="number"],
+    input[type="file"], select, textarea {
+      width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; background: #fff;
+    }
+    textarea { min-height: 110px; resize: vertical; }
+    .btn {
+      margin-top: 14px; background: #2563eb; color: #fff; border: none;
+      padding: 10px 20px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;
+    }
+    .btn:hover { background: #1d4ed8; }
+    .btn-secondary { background: #0f766e; }
+    .btn-secondary:hover { background: #115e59; }
+    .alert-error { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; }
+    .alert-success { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { text-align: left; padding: 11px; border-bottom: 1px solid #e5e7eb; vertical-align: top; font-size: 14px; }
+    th { background: #f9fafb; font-weight: 700; }
+    .badge { display: inline-block; padding: 4px 10px; border-radius: 999px; font-weight: 700; font-size: 13px; background: #dcfce7; color: #166534; }
+    .tag { display: inline-block; background: #eff6ff; color: #1e40af; padding: 2px 8px; border-radius: 4px; margin: 2px; font-size: 12px; }
+    .tag-miss { background: #f3f4f6; color: #4b5563; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Candidate Profile & JD Filter Dashboard</h1>
+      <div class="links">
+        <a href="/api/docs/">Swagger API Docs</a>
+        <a href="/admin/">Admin</a>
+      </div>
+    </div>
+
+    {% if errors %}
+      <div class="alert-error">
+        <strong>Kuch dikkat aayi:</strong>
+        <ul style="margin: 6px 0 0 18px;">
+          {% for err in errors %}
+            <li>{{ err }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    {% if success_message %}
+      <div class="alert-success">
+        <strong>{{ success_message }}</strong>
+      </div>
+    {% endif %}
+
+    <!-- 1. Candidate Personal Info Form -->
+    <div class="card">
+      <h2>Candidate Personal Information Form</h2>
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="save_candidate" />
+
+        <div class="grid-3">
+          <div>
+            <label for="id_name">Full Name *</label>
+            <input type="text" id="id_name" name="name" value="{{ form_data.name }}" placeholder="e.g. Aman Sharma" required />
+          </div>
+          <div>
+            <label for="id_email">Email *</label>
+            <input type="email" id="id_email" name="email" value="{{ form_data.email }}" placeholder="e.g. aman@example.com" required />
+          </div>
+          <div>
+            <label for="id_phone">Phone *</label>
+            <input type="tel" id="id_phone" name="phone" value="{{ form_data.phone }}" placeholder="e.g. +91 9876543210" required />
+          </div>
+        </div>
+
+        <div class="grid-3" style="margin-top: 14px;">
+          <div>
+            <label for="id_qualification">Qualification *</label>
+            <input type="text" id="id_qualification" name="qualification" value="{{ form_data.qualification }}" placeholder="e.g. MCA / B.Tech CSE" required />
+          </div>
+          <div>
+            <label for="id_experience">Experience (Years) *</label>
+            <input type="number" step="0.5" min="0" id="id_experience" name="experience" value="{{ form_data.experience }}" placeholder="e.g. 1.5" required />
+          </div>
+          <div>
+            <label for="id_candidate_resume">Resume (Optional PDF / DOCX)</label>
+            <input type="file" id="id_candidate_resume" name="candidate_resume" accept=".pdf,.docx" />
+          </div>
+        </div>
+
+        <div style="margin-top: 14px;">
+          <label for="id_skills">Skills *</label>
+          <textarea id="id_skills" name="skills" placeholder="e.g. Python, Django, DRF, PostgreSQL, SQL, Git, Docker" required>{{ form_data.skills }}</textarea>
+        </div>
+
+        <button type="submit" class="btn btn-secondary">Save Candidate Profile</button>
+      </form>
+
+      {% if candidate_match_info %}
+        <div style="margin-top: 16px; padding-top: 14px; border-top: 1px solid #e5e7eb;">
+          <strong>JD Match for {{ candidate_match_info.profile.full_name }}:</strong>
+          <span class="badge">{{ candidate_match_info.score }}%</span>
+          <div style="margin-top: 8px;">
+            <small>Matched:</small>
+            {% for kw in candidate_match_info.matched_keywords %}
+              <span class="tag">{{ kw }}</span>
+            {% empty %}
+              <span>-</span>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- 2. JD Resume Bulk Filter & Ranking -->
+    <div class="card">
+      <h2>Filter Candidates by Job Description (Bulk PDF / DOCX)</h2>
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="filter_resumes" />
+
+        <div class="grid-2">
+          <div>
+            <label for="job_id">Existing Job Select Karein (Optional)</label>
+            <select name="job_id" id="job_id">
+              <option value="">-- Custom JD Niche Paste Karein --</option>
+              {% for job in jobs %}
+                <option value="{{ job.id }}" {% if selected_job_id == job.id|stringformat:"s" %}selected{% endif %}>
+                  {{ job.title }} ({{ job.company_name }})
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label for="min_score">Minimum Match Score (%)</label>
+            <input type="number" step="1" min="0" max="100" name="min_score" id="min_score" value="{{ min_score }}" />
+          </div>
+        </div>
+
+        <div style="margin-top: 14px;">
+          <label for="jd_text">Job Description (JD)</label>
+          <textarea name="jd_text" id="jd_text" placeholder="Yahan Python, Django, REST API, SQL, PostgreSQL, Docker jaise requirements paste karein...">{{ jd_text }}</textarea>
+        </div>
+
+        <div style="margin-top: 14px;">
+          <label for="resumes">Upload Resumes (Multiple PDF / DOCX)</label>
+          <input type="file" name="resumes" id="resumes" accept=".pdf,.docx" multiple required />
+        </div>
+
+        <button type="submit" class="btn">Filter & Rank Candidates</button>
+      </form>
+    </div>
+
+    {% if action == "filter_resumes" and not errors %}
+      <div class="card">
+        <h2>Matching Resumes ({{ results|length }} found above {{ min_score }}%)</h2>
+        {% if results %}
+          <table>
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Resume File</th>
+                <th>Match Score</th>
+                <th>Matched JD Keywords</th>
+                <th>Missing Keywords (Sample)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in results %}
+                <tr>
+                  <td>#{{ forloop.counter }}</td>
+                  <td><strong>{{ item.filename }}</strong><br><small>{{ item.char_count }} chars extracted</small></td>
+                  <td><span class="badge">{{ item.score }}%</span></td>
+                  <td>
+                    {% for kw in item.matched_keywords %}
+                      <span class="tag">{{ kw }}</span>
+                    {% empty %}
+                      <span>-</span>
+                    {% endfor %}
+                  </td>
+                  <td>
+                    {% for mkw in item.missing_keywords %}
+                      <span class="tag tag-miss">{{ mkw }}</span>
+                    {% empty %}
+                      <span>-</span>
+                    {% endfor %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <p>Koi resume <strong>{{ min_score }}%</strong> threshold ko pass nahi kar paaya.</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <!-- 3. Saved Candidates Table -->
+    <div class="card">
+      <h2>Saved Candidates ({{ saved_candidates|length }})</h2>
+      {% if saved_candidates %}
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Contact</th>
+              <th>Qualification & Exp</th>
+              <th>Skills</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for cand in saved_candidates %}
+              <tr>
+                <td><strong>{{ cand.full_name }}</strong></td>
+                <td>{{ cand.email }}<br><small>{{ cand.phone }}</small></td>
+                <td>{{ cand.qualification }}<br><small>{{ cand.experience_years }} yrs exp</small></td>
+                <td>{{ cand.skills }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p>Abhi koi candidate profile save nahi hui hai.</p>
+      {% endif %}
+    </div>
+  </div>
+</body>
+</html>
